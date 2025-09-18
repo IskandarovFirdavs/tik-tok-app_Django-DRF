@@ -9,9 +9,9 @@ from tiktok_app import settings
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="Library API",
+        title="TikTok API",
         default_version='v1',
-        description="This Library is the least useful thing in the world",
+        description="This Library is the copy of real tiktok app",
         terms_of_service="https://www.google.com/policies/terms/",
         contact=openapi.Contact(email="contact@snippets.local"),
         license=openapi.License(name="BSD License"),
