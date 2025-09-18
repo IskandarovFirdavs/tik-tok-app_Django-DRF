@@ -1,0 +1,44 @@
+staticfiles/
+static
+assets
+# Byte-compiled / optimized / compiled files
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+*.egg-info/
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Editor-specific files
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+
+# Django-specific files
+db.sqlite3
+media/
+static_collected/
+local_settings.py
+.env
+
+# Logs and temporary files
+*.log
+tmp/
+temp/
+
+*.ini
+*.cfg
+*.conf
+*.yaml
+*.yml
+
+build/
+dist/
+node_modules/ # If using frontend build tools
+
