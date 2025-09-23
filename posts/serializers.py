@@ -16,8 +16,3 @@ class PostModelSerializer(serializers.ModelSerializer):
         model = PostModel
         fields = "__all__"
 
-
-class PostModelCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PostModel
-        fields = ("post", "title", "description", "music", "hashtags")

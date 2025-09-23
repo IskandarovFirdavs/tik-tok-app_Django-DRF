@@ -16,6 +16,7 @@ class UserListCreateView(ListCreateAPIView):
     serializer_class = UserSerializer
     permission_classes = (AllowAny,)
 
+
 class LoginView(APIView):
     permission_classes = (AllowAny,)
 
@@ -31,6 +32,7 @@ class LoginView(APIView):
                 'access_token': str(refresh.access_token)
             })
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class UserDetailView(RetrieveAPIView):

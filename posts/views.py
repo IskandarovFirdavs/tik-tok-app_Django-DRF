@@ -1,22 +1,20 @@
-from rest_framework.generics import CreateAPIView, ListAPIView
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import viewsets, permissions
+from rest_framework.filters import SearchFilter
 
 from posts.models import PostModel
-from posts.serializers import PostModelSerializer, PostModelCreateSerializer
+from posts.serializers import PostModelSerializer
 
 
-class PostCreateAPIView(CreateAPIView):
-    queryset = PostModel.objects.all()
-    serializer_class = PostModelCreateSerializer
-    permission_classes = [IsAuthenticated]
-
-
-class PostListAPIView(ListAPIView):
-    queryset = PostModel.objects.all().order_by("-created_at")
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = PostModel.objects.order_by('-created_at')
     serializer_class = PostModelSerializer
-    permission_classes = [AllowAny]
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context['request'] = self.request
-        return context
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    search_fields = ['title', 'hashtags__name']
+    filter_fields = ['hashtag', 'music']
+
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [permissions.IsAuthenticated()]
+        return []
