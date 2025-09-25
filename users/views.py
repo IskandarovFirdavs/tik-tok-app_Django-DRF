@@ -1,4 +1,6 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import views, status
+from rest_framework.filters import SearchFilter
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, RetrieveAPIView
 from django.contrib.auth import get_user_model, authenticate, login
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -10,11 +12,13 @@ from .serializers import UserSerializer, LoginSerializer
 User = get_user_model()
 
 class UserListCreateView(ListCreateAPIView):
-    from .serializers import UserSerializer
-
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (AllowAny,)
+
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    search_fields = ['username', 'first_name', 'last_name']
+    filter_fields = ['username', 'first_name']
 
 
 class LoginView(APIView):
