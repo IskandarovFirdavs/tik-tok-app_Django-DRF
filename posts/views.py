@@ -3,8 +3,8 @@ from rest_framework import viewsets, permissions
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import ListAPIView
 
-from posts.models import PostModel, HashtagModel
-from posts.serializers import PostModelSerializer, HashtagModelSerializer
+from posts.models import PostModel, HashtagModel, MusicModel
+from posts.serializers import PostModelSerializer, HashtagModelSerializer, MusicModelSerializer
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -28,4 +28,13 @@ class HashtagListView(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = ['name',]
     filter_fields = ['name',]
+
+
+class MusicListView(viewsets.ModelViewSet):
+    queryset = MusicModel.objects.all()
+    serializer_class = MusicModelSerializer
+
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    search_fields = ['singer','music_name']
+    filter_fields = ['singer','music_name']
 

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from posts.models import PostModel, HashtagModel
+from posts.models import PostModel, HashtagModel, MusicModel
 
 
 class PostModelSerializer(serializers.ModelSerializer):
@@ -21,5 +21,11 @@ class PostModelSerializer(serializers.ModelSerializer):
 class HashtagModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = HashtagModel
+        fields = "__all__"
+
+
+class MusicModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MusicModel
         fields = "__all__"
 

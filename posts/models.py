@@ -12,6 +12,7 @@ class HashtagModel(models.Model):
 
 
 class MusicModel(models.Model):
+    cover = models.ImageField(upload_to='music/', null=True, blank=True)
     singer = models.CharField(max_length=100)
     music_name = models.CharField(max_length=100, unique=True)
     file = models.FileField(upload_to='music/')
