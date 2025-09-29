@@ -1,21 +1,6 @@
 from rest_framework import serializers
 from posts.models import PostModel, HashtagModel, MusicModel
-
-
-class PostModelSerializer(serializers.ModelSerializer):
-    post = serializers.SerializerMethodField()
-
-    def get_post(self, obj):
-        request = self.context.get('request')
-        if obj.post and request:
-            return request.build_absolute_uri(obj.post.url)
-        return obj.post.url if obj.post else None
-
-
-    class Meta:
-        model = PostModel
-        fields = "__all__"
-
+from users.serializers import UserSerializer
 
 
 class HashtagModelSerializer(serializers.ModelSerializer):
@@ -28,4 +13,24 @@ class MusicModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = MusicModel
         fields = "__all__"
+
+
+
+class PostModelSerializer(serializers.ModelSerializer):
+    post = serializers.SerializerMethodField()
+    user = UserSerializer(read_only=True)
+    music = MusicModelSerializer(read_only=True)
+    hashtags = HashtagModelSerializer(read_only=True, many=True)
+
+    def get_post(self, obj):
+        request = self.context.get('request')
+        if obj.post and request:
+            return request.build_absolute_uri(obj.post.url)
+        return obj.post.url if obj.post else None
+
+
+    class Meta:
+        model = PostModel
+        fields = "__all__"
+
 
