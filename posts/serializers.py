@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from posts.models import PostModel, HashtagModel, MusicModel
+from posts.models import PostModel, HashtagModel, MusicModel, LikeModel, CommentModel, CommentLikeModel, ReplyModel, \
+    ReplyCommentLikeModel, ViewModel, NotificationModel
 from users.serializers import UserSerializer
 
 
@@ -13,7 +14,6 @@ class MusicModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = MusicModel
         fields = "__all__"
-
 
 
 class PostModelSerializer(serializers.ModelSerializer):
@@ -34,3 +34,43 @@ class PostModelSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class LikeModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LikeModel
+        fields = "__all__"
+
+
+class CommentModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CommentModel
+        fields = "__all__"
+
+
+class CommentLikeModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CommentLikeModel
+        fields = "__all__"
+
+
+class ReplyModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReplyModel
+        fields = "__all__"
+
+
+class ReplyCommentLikeModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReplyCommentLikeModel
+        fields = "__all__"
+
+
+class ViewModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ViewModel
+        fields = "__all__"
+
+
+class NotificationModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NotificationModel
+        fields = "__all__"

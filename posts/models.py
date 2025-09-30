@@ -9,8 +9,6 @@ class HashtagModel(models.Model):
         return f"#{self.name}"
 
 
-
-
 class MusicModel(models.Model):
     cover = models.ImageField(upload_to='music/', null=True, blank=True)
     singer = models.CharField(max_length=100)
@@ -63,7 +61,7 @@ class CommentLikeModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ("comment", "user")
+        unique_together = ("comment", "user",)
 
     def __str__(self):
         return f"{self.user.username} liked comment {self.comment.id}"
@@ -77,6 +75,18 @@ class ReplyModel(models.Model):
 
     def __str__(self):
         return f"{self.user.username} replied: {self.text[:20]}"
+
+
+class ReplyCommentLikeModel(models.Model):
+    reply_comment = models.ForeignKey(ReplyModel, on_delete=models.CASCADE, related_name="reply_likes")
+    user = models.ForeignKey(UserModel, on_delete=models.CASCADE, related_name="reply_comment_likes")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("reply_comment", "user")
+
+    def __str__(self):
+        return f"{self.user.username} liked comment {self.reply_comment.id}"
 
 
 class ViewModel(models.Model):

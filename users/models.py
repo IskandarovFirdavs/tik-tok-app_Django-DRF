@@ -5,7 +5,6 @@ from django.db import models
 class UserModel(AbstractUser):
     bio = models.CharField(max_length=255, null=True, blank=True)
     avatar = models.ImageField(upload_to='user/avatars/', null=True, blank=True)
-    website = models.URLField(null=True, blank=True)
 
     @property
     def followers_count(self):

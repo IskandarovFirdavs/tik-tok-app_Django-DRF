@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
 
+from users.models import Follow
+
 User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
@@ -42,3 +44,10 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError("Login yoki parol noto‘g‘ri")
         data['user'] = user
         return data
+
+
+class FollowSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Follow
+        exclude = 'created_at',
+        read_only_fields = ["follower", "created_at"]

@@ -5,6 +5,7 @@ from .views import (
     UserDetailView,
     LoginView,
     CurrentUserView,
+    FollowToggleView,
 )
 
 
@@ -14,4 +15,5 @@ urlpatterns = [
     path('', UserListCreateView.as_view(), name='users_users_list'),
     path('<int:pk>/', UserDetailView.as_view(), name='users_users_detail'),
     path('me/', CurrentUserView.as_view(), name='users_users_me'),
+    path("follow/<int:user_id>/", FollowToggleView.as_view(), name="follow"),
 ]
