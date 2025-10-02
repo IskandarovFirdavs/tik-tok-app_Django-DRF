@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from posts.models import PostModel, HashtagModel, MusicModel, LikeModel, CommentModel, CommentLikeModel, ReplyModel, \
     ReplyCommentLikeModel, ViewModel, NotificationModel
-from users.serializers import UserSerializer
+from users.serializers import UserSerializer, UserModelSerializer
 
 
 class HashtagModelSerializer(serializers.ModelSerializer):
@@ -13,25 +13,24 @@ class HashtagModelSerializer(serializers.ModelSerializer):
 class MusicModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = MusicModel
-        fields = "__all__"
+        exclude = "created_at",
 
 
 class PostModelSerializer(serializers.ModelSerializer):
-    post = serializers.SerializerMethodField()
-    user = UserSerializer(read_only=True)
+    user = UserModelSerializer(read_only=True)
     music = MusicModelSerializer(read_only=True)
-    hashtags = HashtagModelSerializer(read_only=True, many=True)
-
-    def get_post(self, obj):
-        request = self.context.get('request')
-        if obj.post and request:
-            return request.build_absolute_uri(obj.post.url)
-        return obj.post.url if obj.post else None
-
+    music_id = serializers.PrimaryKeyRelatedField(
+        queryset=MusicModel.objects.all(), write_only=True, source="music"
+    )
+    hashtags = HashtagModelSerializer(many=True, read_only=True)
+    hashtag_ids = serializers.PrimaryKeyRelatedField(
+        queryset=HashtagModel.objects.all(), many=True, write_only=True, source="hashtags"
+    )
 
     class Meta:
         model = PostModel
-        fields = "__all__"
+        fields = ["id", "post", "user", "music", "music_id",
+                  "hashtags", "hashtag_ids", "title", "description", "created_at"]
 
 
 class LikeModelSerializer(serializers.ModelSerializer):
