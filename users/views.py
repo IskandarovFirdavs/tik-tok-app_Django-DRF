@@ -1,5 +1,5 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import views, status
+from rest_framework import views, status, permissions
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import ListCreateAPIView, RetrieveAPIView, CreateAPIView, DestroyAPIView
 from django.contrib.auth import get_user_model, authenticate, login
@@ -22,6 +22,8 @@ class UserListCreateView(ListCreateAPIView):
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = ['username', 'first_name', 'last_name']
     filter_fields = ['username', 'first_name']
+
+
 
 
 class LoginView(APIView):

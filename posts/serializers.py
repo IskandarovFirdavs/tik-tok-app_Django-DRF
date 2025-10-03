@@ -16,22 +16,30 @@ class MusicModelSerializer(serializers.ModelSerializer):
         exclude = "created_at",
 
 
+# posts/serializers.py
 class PostModelSerializer(serializers.ModelSerializer):
     user = UserModelSerializer(read_only=True)
     music = MusicModelSerializer(read_only=True)
     music_id = serializers.PrimaryKeyRelatedField(
-        queryset=MusicModel.objects.all(), write_only=True, source="music"
+        queryset=MusicModel.objects.all(),
+        write_only=True,
+        source="music",
+        required=False,
+        allow_null=True
     )
     hashtags = HashtagModelSerializer(many=True, read_only=True)
     hashtag_ids = serializers.PrimaryKeyRelatedField(
-        queryset=HashtagModel.objects.all(), many=True, write_only=True, source="hashtags"
+        queryset=HashtagModel.objects.all(),
+        many=True,
+        write_only=True,
+        source="hashtags",
+        required=False
     )
 
     class Meta:
         model = PostModel
         fields = ["id", "post", "user", "music", "music_id",
                   "hashtags", "hashtag_ids", "title", "description", "created_at"]
-
 
 class LikeModelSerializer(serializers.ModelSerializer):
     class Meta:
