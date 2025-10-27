@@ -35,14 +35,19 @@ class MusicModelSerializer(serializers.ModelSerializer):
 # ============================
 # 🔹 COMMENT SERIALIZERS
 # ============================
-
 class CommentModelSerializer(serializers.ModelSerializer):
     user = UserModelSerializer(read_only=True)
+    replies = serializers.SerializerMethodField()
 
     class Meta:
         model = CommentModel
-        fields = ['id', 'user', 'text', 'created_at']
+        fields = ['id', 'user', 'text', 'created_at', 'replies']
         read_only_fields = ['id', 'user', 'created_at']
+
+    def get_replies(self, obj):
+        from posts.serializers import ReplyModelSerializer
+        replies = obj.replies.all().order_by('created_at')
+        return ReplyModelSerializer(replies, many=True, context=self.context).data
 
 
 class CommentLikeSerializer(serializers.ModelSerializer):
@@ -122,8 +127,6 @@ class LikeModelSerializer(serializers.ModelSerializer):
 
 class ReplyModelSerializer(serializers.ModelSerializer):
     user = UserModelSerializer(read_only=True)
-    post = PostModelSerializer(read_only=True)
-    comment = CommentModelSerializer(read_only=True)
 
     class Meta:
         model = ReplyModel

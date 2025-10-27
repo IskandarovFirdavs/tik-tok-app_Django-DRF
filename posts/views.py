@@ -335,9 +335,3 @@ class ReplyCommentDislikeView(viewsets.ModelViewSet):
             return Response({'detail': 'reply comment did not exist'}, status=HTTP_404_NOT_FOUND)
 
 
-# class NotificationView(viewsets.ModelViewSet):
-#     queryset = NotificationModel.objects.all()
-#     serializer_class = NotificationModelSerializer
-#     permission_classes = (IsAuthenticated,)
-#
-#     def create(self, request, *args, **kwargs):
