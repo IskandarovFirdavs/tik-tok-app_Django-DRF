@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import (
     HashtagModel, MusicModel, PostModel,
-    LikeModel, CommentModel, CommentLikeModel, ReplyModel, ViewModel, NotificationModel
+    LikeModel, CommentModel, CommentLikeModel, ReplyModel, ViewModel, NotificationModel, CommentDislikeModel
 )
 
 
@@ -37,7 +37,7 @@ class LikeInline(admin.TabularInline):
 class CommentInline(admin.TabularInline):
     model = CommentModel
     extra = 0
-    readonly_fields = ('user', 'text', 'created_at')
+    readonly_fields = ('id', 'user', 'text', 'created_at')
 
 
 class ViewInline(admin.TabularInline):
@@ -48,7 +48,7 @@ class ViewInline(admin.TabularInline):
 
 @admin.register(PostModel)
 class PostAdmin(admin.ModelAdmin):
-    list_display = ('title', 'user', 'music', 'created_at', 'likes_count', 'comments_count', 'views_count')
+    list_display = ('id','title', 'user', 'music', 'created_at', 'likes_count', 'comments_count', 'views_count')
     search_fields = ('title', 'description', 'user__username', 'hashtags__name')
     list_filter = ('created_at', 'hashtags', 'music')
     filter_horizontal = ('hashtags',)
@@ -85,6 +85,12 @@ class CommentLikeInline(admin.TabularInline):
     readonly_fields = ('user', 'created_at')
 
 
+class CommentDislikeInline(admin.TabularInline):
+    model = CommentDislikeModel
+    extra = 0
+    readonly_fields = ('user', 'created_at')
+
+
 class ReplyInline(admin.TabularInline):
     model = ReplyModel
     extra = 0
@@ -93,12 +99,12 @@ class ReplyInline(admin.TabularInline):
 
 @admin.register(CommentModel)
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ('user', 'post', 'text_preview', 'created_at', 'likes_count')
+    list_display = ('id', 'user', 'post', 'text_preview', 'created_at', 'likes_count')
     search_fields = ('user__username', 'post__title', 'text')
     list_filter = ('created_at',)
     readonly_fields = ('created_at',)
     ordering = ('-created_at',)
-    inlines = [CommentLikeInline, ReplyInline]
+    inlines = [CommentLikeInline, CommentDislikeInline, ReplyInline]
 
     def text_preview(self, obj):
         return obj.text[:50] + '...' if len(obj.text) > 50 else obj.text
@@ -118,9 +124,20 @@ class CommentLikeAdmin(admin.ModelAdmin):
     ordering = ('-created_at',)
 
 
+
+@admin.register(CommentDislikeModel)
+class CommentDislikeAdmin(admin.ModelAdmin):
+    list_display = ('user', 'comment', 'created_at')
+    search_fields = ('user__username', 'comment__text')
+    list_filter = ('created_at',)
+    readonly_fields = ('created_at',)
+    ordering = ('-created_at',)
+
+
+
 @admin.register(ReplyModel)
 class ReplyAdmin(admin.ModelAdmin):
-    list_display = ('user', 'comment', 'text_preview', 'created_at')
+    list_display = ('id','user', 'comment', 'text_preview', 'created_at')
     search_fields = ('user__username', 'comment__text', 'text')
     list_filter = ('created_at',)
     readonly_fields = ('created_at',)

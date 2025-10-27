@@ -9,10 +9,14 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.shortcuts import get_object_or_404
+
+from posts.models import PostModel
+from posts.serializers import PostModelSerializer
 from .models import Follow
-from .serializers import UserSerializer, LoginSerializer, FollowSerializer
+from .serializers import UserSerializer, LoginSerializer, FollowSerializer, UserModelSerializer
 
 User = get_user_model()
+
 
 class UserListCreateView(ListCreateAPIView):
     queryset = User.objects.all()
@@ -22,8 +26,6 @@ class UserListCreateView(ListCreateAPIView):
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = ['username', 'first_name', 'last_name']
     filter_fields = ['username', 'first_name']
-
-
 
 
 class LoginView(APIView):
@@ -54,14 +56,48 @@ class CurrentUserView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        serializer = UserSerializer(request.user)
-        return Response(serializer.data)
+        posts = PostModel.objects.filter(user=request.user)
+        post_serializer = PostModelSerializer(posts, many=True)
+
+        saved_posts = request.user.saved_posts.all()
+        reposts = request.user.reposts.all()
+
+        saved_posts_serializer = PostModelSerializer(saved_posts, many=True)
+        reposts_serializer = PostModelSerializer(reposts, many=True)
+
+        return Response({
+            "id": request.user.id,
+            "username": request.user.username,
+            "first_name": getattr(request.user, "first_name", ""),
+            "last_name": getattr(request.user, "last_name", ""),
+            "avatar": request.build_absolute_uri(request.user.avatar.url) if request.user.avatar else None,
+            "bio": getattr(request.user, "bio", ""),
+            "follower_count": request.user.followers_count,
+            "following_count": request.user.following_count,
+            "posts": post_serializer.data,
+            "saved_posts": saved_posts_serializer.data,
+            "reposts": reposts_serializer.data
+        })
+
+    def put(self, request):
+        serializer = UserModelSerializer(request.user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request):
+        user = request.user
+        user.delete()
+        return Response(
+            {'message': 'User deleted successfully'},
+            status=status.HTTP_204_NO_CONTENT
+        )
 
 
 class FollowToggleView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
-
 
     def post(self, request, user_id):
         if request.user.id == user_id:
@@ -93,3 +129,16 @@ class FollowToggleView(APIView):
                 status=status.HTTP_201_CREATED
             )
 
+
+
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            refresh_token = request.data["refresh"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response({"message": "Logged out successfully"}, status=status.HTTP_205_RESET_CONTENT)
+        except Exception:
+            return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)

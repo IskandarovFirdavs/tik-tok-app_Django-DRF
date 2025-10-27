@@ -38,7 +38,8 @@ class UserSerializer(serializers.ModelSerializer):
 class UserModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username',)
+        fields = ('id', 'username', 'last_name', 'first_name', 'bio', 'avatar', 'saved_posts', 'reposts')
+
 
 
 class LoginSerializer(serializers.Serializer):
@@ -57,4 +58,4 @@ class FollowSerializer(serializers.ModelSerializer):
     class Meta:
         model = Follow
         exclude = 'created_at',
-        read_only_fields = ["follower", "created_at"]
+        read_only_fields = ("follower", "created_at",)

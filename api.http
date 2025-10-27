@@ -1,0 +1,191 @@
+### 🔐 LOGIN — JWT token olish
+POST http://127.0.0.1:8000/users/login/
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin"
+}
+
+
+### 🔄 TOKEN yangilash
+POST http://127.0.0.1:8000/users/token/refresh/
+Content-Type: application/json
+
+{
+ "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc5MTcxMzQxMCwiaWF0IjoxNzYwNjA5NDEwLCJqdGkiOiI2NTA0MGY3NTU1NmM0NjgzOTU3YTM1ZWViYTIzNzg2ZSIsInVzZXJfaWQiOiI1In0.Z2b_X0By7uxplkz_eK85I8Y31YcDgo4d14xGy7Z0IPo"
+}
+
+### 👥 FOYDALANUVCHILAR RO‘YXATI (register bilan birga)
+GET http://127.0.0.1:8000/users/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkxNjU2OTM0LCJpYXQiOjE3NjA1NTI5MzQsImp0aSI6IjdkMDBkYWJjY2QzNDQ2YzU4NTc4NTU5MmYzY2E5NzEwIiwidXNlcl9pZCI6IjUifQ.4McnLOiPUSP8qBu6hgPQvgdTIUO9Rm3EBkiZ53eupNA
+
+### 🆕 YANGI USER RO‘YXATGA OLISH
+POST http://127.0.0.1:8000/users/
+Content-Type: application/json
+
+{
+  "username": "newuser",
+  "email": "newuser@example.com",
+  "password": "1234",
+  "first_name": "New",
+  "last_name": "User"
+}
+
+
+### 👤 BITTA USER DETAIL KO‘RISH (ID bo‘yicha)
+GET http://127.0.0.1:8000/users/6/
+Content-Type: application/json
+
+
+### ✏️ CURRENT USER MA'LUMOTLARINI CHIQARISH
+GET http://127.0.0.1:8000/users/me/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkxODg0NTc1LCJpYXQiOjE3NjA3ODA1NzUsImp0aSI6IjQ5ZTY1YmE1MmYxMTQwNjRhZjQ1OWU1MGE5ZTg5MjE2IiwidXNlcl9pZCI6IjMifQ.sL7o26b9r_G1l-fkwAjaWhzXjqmIwyk6HmHfILi_AnU
+Content-Type: application/json
+
+
+### ✏️ CURRENT USER MA'LUMOTLARINI YANGILASH (PUT)
+PUT http://127.0.0.1:8000/users/me/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkxODg0NTc1LCJpYXQiOjE3NjA3ODA1NzUsImp0aSI6IjQ5ZTY1YmE1MmYxMTQwNjRhZjQ1OWU1MGE5ZTg5MjE2IiwidXNlcl9pZCI6IjMifQ.sL7o26b9r_G1l-fkwAjaWhzXjqmIwyk6HmHfILi_AnU
+Content-Type: application/json
+{
+  "first_name": "Jamil",
+  "last_name": "Kandimov",
+  "bio": "Full-stack developer",
+  "avatar": null
+}
+
+### 🧑‍💻 CURRENT USER O‘CHIRISH
+DELETE http://127.0.0.1:8000/users/me/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkxMTE0OTQ2LCJpYXQiOjE3NjAwMTA5NDYsImp0aSI6IjFkODU3NTBjMTVlZTRhZTNiYjUzODkxNTdjMGNiNWU1IiwidXNlcl9pZCI6IjIifQ.NHjJHuw2CY3mM7rYLCdKWpdUQTJvfMzppBnhjkOeyD0
+Content-Type: application/json
+
+
+### 🧑‍💻 POST UPDATE
+PATCH http://127.0.0.1:8000/posts/post/35/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkxMjc4OTQ1LCJpYXQiOjE3NjAxNzQ5NDUsImp0aSI6IjMwYzljNzc4Zjg4NDQ5NWM4OTUyOWE3ZmQ2YTgyZWU0IiwidXNlcl9pZCI6IjUifQ.FUpi4a0e0hZkGV72guhnSOd3OChdI8Plml0q3SpEjPI
+Content-Type: application/json
+
+{
+    "title": "new title is here",
+    "description": "Nothing beats a Jet2 Holiday",
+    "music_id": 2,
+    "hashtag_ids": [1]
+}
+
+
+### POST DETAIL
+GET http://127.0.0.1:8000/posts/post/35/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkxNTQzMTA4LCJpYXQiOjE3NjA0MzkxMDgsImp0aSI6IjdhOWY4ZGI4ZmNhNDQ4NTJiM2QwOTVmZmVhYzUwYjU3IiwidXNlcl9pZCI6IjUifQ.n5vq8BsIeScfP6tfArsnOaOGVFq9nz7gM-9_wkoXP1E
+Content-Type: application/json
+
+
+### 🧑‍💻 POST  O‘CHIRISH
+DELETE http://127.0.0.1:8000/posts/post/39/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkxMjc4OTQ1LCJpYXQiOjE3NjAxNzQ5NDUsImp0aSI6IjMwYzljNzc4Zjg4NDQ5NWM4OTUyOWE3ZmQ2YTgyZWU0IiwidXNlcl9pZCI6IjUifQ.FUpi4a0e0hZkGV72guhnSOd3OChdI8Plml0q3SpEjPI
+Content-Type: application/json
+
+
+
+
+### Like yaratish yoki o'chirish
+POST http://127.0.0.1:8000/posts/likes/
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyNDk4MDc5LCJpYXQiOjE3NjEzOTQwNzksImp0aSI6IjIxMDA0NWMwNjQwMzQxNjNhMmE2NDFlYjFjNTNhNjFkIiwidXNlcl9pZCI6IjUifQ.w21Yr97Oj75TkwMpLhent0AfPV_VY25lOjub5KMuDbw
+
+{
+  "post": 37
+}
+
+
+
+### Comment yaratish
+POST http://127.0.0.1:8000/posts/comments/
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkxNTQzMTA4LCJpYXQiOjE3NjA0MzkxMDgsImp0aSI6IjdhOWY4ZGI4ZmNhNDQ4NTJiM2QwOTVmZmVhYzUwYjU3IiwidXNlcl9pZCI6IjUifQ.n5vq8BsIeScfP6tfArsnOaOGVFq9nz7gM-9_wkoXP1E
+
+{
+  "post": 35,
+  "text": "This is a comment"
+}
+
+
+### Comment edit
+PATCH http://127.0.0.1:8000/posts/comments/1/
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkxNDc5ODI4LCJpYXQiOjE3NjAzNzU4MjgsImp0aSI6IjQ0Mjg0ZTVlMGJlNzQxYTdiMjA4NmFhNDFlYjgxYjlmIiwidXNlcl9pZCI6IjUifQ.jOQgACIuCf8O6mk85OsdCcrKFTCgyo3cR4jVFUO7F7U
+
+{
+  "text": "This is edited comment"
+}
+
+
+
+### Comment delete
+DELETE http://127.0.0.1:8000/posts/comments/3/
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkxNDc5ODI4LCJpYXQiOjE3NjAzNzU4MjgsImp0aSI6IjQ0Mjg0ZTVlMGJlNzQxYTdiMjA4NmFhNDFlYjgxYjlmIiwidXNlcl9pZCI6IjUifQ.jOQgACIuCf8O6mk85OsdCcrKFTCgyo3cR4jVFUO7F7U
+
+
+### Comment like 
+POST http://127.0.0.1:8000/posts/comment_like/
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkxNTQ3MDYzLCJpYXQiOjE3NjA0NDMwNjMsImp0aSI6IjZhNWQ5Zjk3NTFhODRlZGI4OGFkYTA2ZjE5ZGVlYzMwIiwidXNlcl9pZCI6IjUifQ.Q-5oZGYlUZeOmAr4gE3Qf4w18iN3ReK70TOvwRhlLg4
+
+{
+  "comment": 4
+}
+
+`
+### Comment dislike 
+POST http://127.0.0.1:8000/posts/comment_dislike/
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkxNTQ3MDYzLCJpYXQiOjE3NjA0NDMwNjMsImp0aSI6IjZhNWQ5Zjk3NTFhODRlZGI4OGFkYTA2ZjE5ZGVlYzMwIiwidXNlcl9pZCI6IjUifQ.Q-5oZGYlUZeOmAr4gE3Qf4w18iN3ReK70TOvwRhlLg4
+
+{
+  "comment": 4
+}
+
+
+### Reply-comments
+GET http://127.0.0.1:8000/posts/reply_comments/
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkxNzEzNDE5LCJpYXQiOjE3NjA2MDk0MTksImp0aSI6ImMzYjVkNDJlOGUyMzRhZDBiYmNhNWI4MTE2ZTJkMThhIiwidXNlcl9pZCI6IjUifQ.lCDXCtsacEG-EQ6LdDgfdBHDXjHPZJljMbN89laxsJg
+
+
+### Reply-comment yaratish
+POST http://127.0.0.1:8000/posts/reply_comments/
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkxNjU2OTM0LCJpYXQiOjE3NjA1NTI5MzQsImp0aSI6IjdkMDBkYWJjY2QzNDQ2YzU4NTc4NTU5MmYzY2E5NzEwIiwidXNlcl9pZCI6IjUifQ.4McnLOiPUSP8qBu6hgPQvgdTIUO9Rm3EBkiZ53eupNA
+
+{
+  "post": 35,
+  "comment": 4,
+  "text": "This is a reply_comment 4"
+}
+
+
+
+### Reply comment like 
+POST http://127.0.0.1:8000/posts/reply_comment_likes/
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkxNzEzNjY1LCJpYXQiOjE3NjA2MDk2NjUsImp0aSI6ImEzNThmNGFmMjAzMjQzZjlhMWY2MzhlN2VjOTYzYTIwIiwidXNlcl9pZCI6IjUifQ.qFhFAw8mSOZtn02WBE8dwCJAqQU-B7wiuLtvkaGlAaM
+
+{
+  "reply_comment": 1
+}
+
+
+### Reply comment dislike 
+POST http://127.0.0.1:8000/posts/reply_comment_dislikes/
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkxNzEzNjY1LCJpYXQiOjE3NjA2MDk2NjUsImp0aSI6ImEzNThmNGFmMjAzMjQzZjlhMWY2MzhlN2VjOTYzYTIwIiwidXNlcl9pZCI6IjUifQ.qFhFAw8mSOZtn02WBE8dwCJAqQU-B7wiuLtvkaGlAaM
+
+{
+  "reply_comment": 1
+}
+
+
+
+
+
