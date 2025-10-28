@@ -182,21 +182,30 @@ class CommentLikeViewSet(viewsets.ModelViewSet):
 
         if not comment_id:
             return Response({'detail': 'Comment did not find'}, status=HTTP_400_BAD_REQUEST)
+
         try:
             comment = CommentModel.objects.get(id=comment_id)
-            comment_like = CommentLikeModel.objects.filter(comment=comment, user=user)
-            dislike = CommentDislikeModel.objects.filter(comment=comment, user=user)
-            if dislike:
-                dislike.delete()
-                CommentLikeModel.objects.create(comment=comment, user=user)
-                return Response({'detail': "Dislike removed and Comment liked successfully"}, status=HTTP_201_CREATED)
-            elif comment_like:
-                comment_like.delete()
-                return Response({'detail': "Comment like removed successfully"}, status=HTTP_204_NO_CONTENT)
+
+            # check existence
+            comment_like_qs = CommentLikeModel.objects.filter(comment=comment, user=user)
+            dislike_qs = CommentDislikeModel.objects.filter(comment=comment, user=user)
+
+            if comment_like_qs.exists():
+                # already liked -> remove like (toggle off)
+                comment_like_qs.delete()
+                # serialize updated comment and return
+                serializer = CommentModelSerializer(comment, context={'request': request})
+                return Response(serializer.data, status=HTTP_200_OK)
+
+            # if disliked before -> remove dislike first, then create like
+            if dislike_qs.exists():
+                dislike_qs.delete()
 
             CommentLikeModel.objects.create(comment=comment, user=user)
-            return Response({'detail': "Comment liked successfully"}, status=HTTP_201_CREATED)
 
+            # serialize authoritative comment and return
+            serializer = CommentModelSerializer(comment, context={'request': request})
+            return Response(serializer.data, status=HTTP_200_OK)
 
         except CommentModel.DoesNotExist:
             return Response({'detail': 'Comment did not exist'}, status=HTTP_404_NOT_FOUND)
@@ -213,20 +222,27 @@ class CommentDislikeViewSet(viewsets.ModelViewSet):
 
         if not comment_id:
             return Response({'detail': 'Comment did not find'}, status=HTTP_400_BAD_REQUEST)
-        try:                                
+
+        try:
             comment = CommentModel.objects.get(id=comment_id)
-            comment_like = CommentLikeModel.objects.filter(comment=comment, user=user)
-            dislike = CommentDislikeModel.objects.filter(comment=comment, user=user)
-            if comment_like:
-                comment_like.delete()
-                CommentDislikeModel.objects.create(comment=comment, user=user)
-                return Response({'detail': "Like removed and Comment disliked successfully"}, status=HTTP_201_CREATED)
-            elif dislike:
-                dislike.delete()
-                return Response({'detail': "Comment dislike removed successfully"}, status=HTTP_204_NO_CONTENT)
-            
+
+            dislike_qs = CommentDislikeModel.objects.filter(comment=comment, user=user)
+            like_qs = CommentLikeModel.objects.filter(comment=comment, user=user)
+
+            if dislike_qs.exists():
+                # already disliked -> remove dislike
+                dislike_qs.delete()
+                serializer = CommentModelSerializer(comment, context={'request': request})
+                return Response(serializer.data, status=HTTP_200_OK)
+
+            # if liked before -> remove like first, then create dislike
+            if like_qs.exists():
+                like_qs.delete()
+
             CommentDislikeModel.objects.create(comment=comment, user=user)
-            return Response({'detail': "Comment disliked successfully"}, status=HTTP_201_CREATED)
+            serializer = CommentModelSerializer(comment, context={'request': request})
+            return Response(serializer.data, status=HTTP_200_OK)
+
         except CommentModel.DoesNotExist:
             return Response({'detail': 'Comment did not exist'}, status=HTTP_404_NOT_FOUND)
 
@@ -289,18 +305,21 @@ class ReplyCommentLikeView(viewsets.ModelViewSet):
             return Response({'detail':'Reply comment did not find'}, status=HTTP_400_BAD_REQUEST)
         try:
             reply_comment = ReplyModel.objects.get(id=reply_comment_id)
-            reply_comment_like = ReplyCommentLikeModel.objects.filter(reply_comment=reply_comment, user=user)
-            dislike = ReplyCommentDislikeModel.objects.filter(reply_comment=reply_comment, user=user)
-            if dislike:
-                dislike.delete()
-                ReplyCommentLikeModel.objects.create(reply_comment=reply_comment, user=user)
-                return Response({'detail':'reply disliked and reply liked'}, status=HTTP_201_CREATED)
-            elif reply_comment_like:
-                reply_comment_like.delete()
-                return Response({'detail':'reply like removed'}, status=HTTP_204_NO_CONTENT)
+
+            like_qs = ReplyCommentLikeModel.objects.filter(reply_comment=reply_comment, user=user)
+            dislike_qs = ReplyCommentDislikeModel.objects.filter(reply_comment=reply_comment, user=user)
+
+            if like_qs.exists():
+                like_qs.delete()
+                serializer = ReplyModelSerializer(reply_comment, context={'request': request})
+                return Response(serializer.data, status=HTTP_200_OK)
+
+            if dislike_qs.exists():
+                dislike_qs.delete()
 
             ReplyCommentLikeModel.objects.create(reply_comment=reply_comment, user=user)
-            return Response({'detail':'reply comment liked'}, status=HTTP_201_CREATED)
+            serializer = ReplyModelSerializer(reply_comment, context={'request': request})
+            return Response(serializer.data, status=HTTP_200_OK)
         except ReplyModel.DoesNotExist:
             return Response({'detail':'reply comment did not exist'}, status=HTTP_404_NOT_FOUND)
 
@@ -318,20 +337,21 @@ class ReplyCommentDislikeView(viewsets.ModelViewSet):
             return Response({'detail': 'Reply comment did not find'}, status=HTTP_400_BAD_REQUEST)
         try:
             reply_comment = ReplyModel.objects.get(id=reply_comment_id)
-            reply_comment_like = ReplyCommentLikeModel.objects.filter(reply_comment=reply_comment, user=user)
-            dislike = ReplyCommentDislikeModel.objects.filter(reply_comment=reply_comment, user=user)
-            if reply_comment_like:
-                reply_comment_like.delete()
-                ReplyCommentDislikeModel.objects.create(reply_comment=reply_comment, user=user)
-                return Response({'detail': 'reply liked and reply disliked'},
-                                status=HTTP_201_CREATED)
-            elif dislike:
-                dislike.delete()
-                return Response({'detail': 'reply like removed'}, status=HTTP_204_NO_CONTENT)
+
+            dislike_qs = ReplyCommentDislikeModel.objects.filter(reply_comment=reply_comment, user=user)
+            like_qs = ReplyCommentLikeModel.objects.filter(reply_comment=reply_comment, user=user)
+
+            if dislike_qs.exists():
+                dislike_qs.delete()
+                serializer = ReplyModelSerializer(reply_comment, context={'request': request})
+                return Response(serializer.data, status=HTTP_200_OK)
+
+            if like_qs.exists():
+                like_qs.delete()
 
             ReplyCommentDislikeModel.objects.create(reply_comment=reply_comment, user=user)
-            return Response({'detail': 'reply comment disliked'}, status=HTTP_201_CREATED)
+            serializer = ReplyModelSerializer(reply_comment, context={'request': request})
+            return Response(serializer.data, status=HTTP_200_OK)
         except ReplyModel.DoesNotExist:
             return Response({'detail': 'reply comment did not exist'}, status=HTTP_404_NOT_FOUND)
-
 

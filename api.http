@@ -102,10 +102,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiY
 ### Comment yaratish
 POST http://127.0.0.1:8000/posts/comments/
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkxNTQzMTA4LCJpYXQiOjE3NjA0MzkxMDgsImp0aSI6IjdhOWY4ZGI4ZmNhNDQ4NTJiM2QwOTVmZmVhYzUwYjU3IiwidXNlcl9pZCI6IjUifQ.n5vq8BsIeScfP6tfArsnOaOGVFq9nz7gM-9_wkoXP1E
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyNjk5NDk1LCJpYXQiOjE3NjE1OTU0OTUsImp0aSI6IjI2MzllY2UzMWU5NzQ1NWI4ZDc2Yjk0NWNlYmRiZWE1IiwidXNlcl9pZCI6IjUifQ.AgydLzSiAWbq-liElG6twdPwnot5DMBnBPPMr6Is5Ao
 
 {
-  "post": 35,
+  "post": 37,
   "text": "This is a comment"
 }
 

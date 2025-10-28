@@ -35,20 +35,108 @@ class MusicModelSerializer(serializers.ModelSerializer):
 # ============================
 # 🔹 COMMENT SERIALIZERS
 # ============================
+# ============================
+# 🔹 COMMENT SERIALIZERS
+# ============================
 class CommentModelSerializer(serializers.ModelSerializer):
     user = UserModelSerializer(read_only=True)
     replies = serializers.SerializerMethodField()
 
+    likes_count = serializers.SerializerMethodField()
+    dislikes_count = serializers.SerializerMethodField()
+    liked_by_current_user = serializers.SerializerMethodField()
+    disliked_by_current_user = serializers.SerializerMethodField()
+
     class Meta:
         model = CommentModel
-        fields = ['id', 'user', 'text', 'created_at', 'replies']
-        read_only_fields = ['id', 'user', 'created_at']
+        # hozir barcha kerakli maydonlar
+        fields = [
+            "id",
+            "user",
+            "text",
+            "created_at",
+            "replies",
+            "likes_count",
+            "dislikes_count",
+            "liked_by_current_user",
+            "disliked_by_current_user",
+        ]
+        read_only_fields = ["id", "user", "created_at"]
 
     def get_replies(self, obj):
         from posts.serializers import ReplyModelSerializer
-        replies = obj.replies.all().order_by('created_at')
+        replies = obj.replies.all().order_by("created_at")
         return ReplyModelSerializer(replies, many=True, context=self.context).data
 
+    def get_likes_count(self, obj):
+        # CommentLikeModel import topida mavjud
+        return CommentLikeModel.objects.filter(comment=obj).count()
+
+    def get_dislikes_count(self, obj):
+        return CommentDislikeModel.objects.filter(comment=obj).count()
+
+    def get_liked_by_current_user(self, obj):
+        request = self.context.get("request", None)
+        if request and request.user and request.user.is_authenticated:
+            return CommentLikeModel.objects.filter(comment=obj, user=request.user).exists()
+        return False
+
+    def get_disliked_by_current_user(self, obj):
+        request = self.context.get("request", None)
+        if request and request.user and request.user.is_authenticated:
+            return CommentDislikeModel.objects.filter(comment=obj, user=request.user).exists()
+        return False
+
+
+# ============================
+# 🔹 REPLY SERIALIZER
+# ============================
+class ReplyModelSerializer(serializers.ModelSerializer):
+    user = UserModelSerializer(read_only=True)
+
+    # 🔹 Dynamic fields
+    likes_count = serializers.SerializerMethodField()
+    dislikes_count = serializers.SerializerMethodField()
+    liked_by_current_user = serializers.SerializerMethodField()
+    disliked_by_current_user = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ReplyModel
+        fields = [
+            'id',
+            'user',
+            'post',
+            'comment',
+            'text',
+            'created_at',
+            'likes_count',
+            'dislikes_count',
+            'liked_by_current_user',
+            'disliked_by_current_user',
+        ]
+        read_only_fields = ['id', 'user', 'created_at']
+
+    def get_likes_count(self, obj):
+        return ReplyCommentLikeModel.objects.filter(reply_comment=obj).count()
+
+    def get_dislikes_count(self, obj):
+        return ReplyCommentDislikeModel.objects.filter(reply_comment=obj).count()
+
+    def get_liked_by_current_user(self, obj):
+        request = self.context.get('request', None)
+        if request and request.user.is_authenticated:
+            return ReplyCommentLikeModel.objects.filter(
+                reply_comment=obj, user=request.user
+            ).exists()
+        return False
+
+    def get_disliked_by_current_user(self, obj):
+        request = self.context.get('request', None)
+        if request and request.user.is_authenticated:
+            return ReplyCommentDislikeModel.objects.filter(
+                reply_comment=obj, user=request.user
+            ).exists()
+        return False
 
 class CommentLikeSerializer(serializers.ModelSerializer):
     user = UserModelSerializer(read_only=True)
@@ -120,17 +208,6 @@ class LikeModelSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'post', 'created_at']
         read_only_fields = ['id', 'user', 'created_at']
 
-
-# ============================
-# 🔹 REPLY & REPLY COMMENT SERIALIZERS
-# ============================
-
-class ReplyModelSerializer(serializers.ModelSerializer):
-    user = UserModelSerializer(read_only=True)
-
-    class Meta:
-        model = ReplyModel
-        fields = "__all__"
 
 
 class ReplyCommentLikeModelSerializer(serializers.ModelSerializer):
