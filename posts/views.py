@@ -274,9 +274,8 @@ class ReplyCommentView(viewsets.ModelViewSet):
 
     def partial_update(self, request, *args, **kwargs):
         instance = self.get_object()
-
-        if request.user != instance.user or not request.user.is_staff:
-            return Response({'detail':'You can delete only your reply comments'}, status=HTTP_403_FORBIDDEN)
+        if request.user != instance.user:
+            return Response({'detail':'You can edit only your reply comments'}, status=HTTP_403_FORBIDDEN)
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -286,7 +285,7 @@ class ReplyCommentView(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
 
-        if instance.user != request.user or not request.user.is_staff:
+        if instance.user != request.user:
             return Response({'detail':'You can delete only your reply comments'}, status=HTTP_403_FORBIDDEN)
         instance.delete()
         return Response({"detail":'Reply comment deleted'}, status=HTTP_204_NO_CONTENT)
