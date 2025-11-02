@@ -1,7 +1,8 @@
 from django.contrib import admin
 from .models import (
     HashtagModel, MusicModel, PostModel,
-    LikeModel, CommentModel, CommentLikeModel, ReplyModel, ViewModel, NotificationModel, CommentDislikeModel
+    LikeModel, CommentModel, CommentLikeModel, ReplyModel, ViewModel, NotificationModel, CommentDislikeModel, SaveModel,
+    RepostModel
 )
 
 
@@ -168,3 +169,13 @@ class NotificationAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('receiver', 'sender', 'post')
+
+
+@admin.register(SaveModel)
+class SaveAdmin(admin.ModelAdmin):
+    list_display = ('user', 'post', 'created_at')
+
+
+@admin.register(RepostModel)
+class RepostAdmin(admin.ModelAdmin):
+    list_display = ('user', 'post', 'created_at')

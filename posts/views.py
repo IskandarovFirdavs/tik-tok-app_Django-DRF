@@ -1,3 +1,4 @@
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
@@ -6,10 +7,11 @@ from rest_framework.filters import SearchFilter
 from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND, HTTP_201_CREATED, HTTP_200_OK, HTTP_403_FORBIDDEN, HTTP_204_NO_CONTENT
 
 from posts.models import PostModel, HashtagModel, MusicModel, LikeModel, CommentModel, CommentLikeModel, \
-    CommentDislikeModel, ReplyModel, ReplyCommentLikeModel, ReplyCommentDislikeModel, NotificationModel
+    CommentDislikeModel, ReplyModel, ReplyCommentLikeModel, ReplyCommentDislikeModel, NotificationModel, SaveModel, \
+    RepostModel
 from posts.serializers import CommentLikeSerializer, PostModelSerializer, HashtagModelSerializer, MusicModelSerializer, \
     LikeModelSerializer, CommentModelSerializer, CommentDislikeSerializer, ReplyModelSerializer, \
-    ReplyCommentLikeModelSerializer, ReplyCommentDislikeModelSerializer
+    ReplyCommentLikeModelSerializer, ReplyCommentDislikeModelSerializer, SaveModelSerializer, RepostModelSerializer
 
 
 class HashtagListView(viewsets.ModelViewSet):
@@ -82,6 +84,25 @@ class PostViewSet(viewsets.ModelViewSet):
         context = super().get_serializer_context()
         context['request'] = self.request
         return context
+
+    @action(detail=True, methods=['get'], url_path='reposts', url_name='post-reposts')
+    def get_reposts(self, request, pk=None):
+        try:
+            post = self.get_object()
+            reposts = post.reposts.all().order_by('-created_at')
+            serializer = RepostModelSerializer(reposts, many=True, context={'request': request})
+
+            return Response({
+                'post_id': post.id,
+                'reposts_count': reposts.count(),
+                'reposts': serializer.data
+            }, status=status.HTTP_200_OK)
+
+        except PostModel.DoesNotExist:
+            return Response(
+                {"error": "Post not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
 
 class GenreListViewSet(viewsets.ViewSet):
@@ -354,3 +375,77 @@ class ReplyCommentDislikeView(viewsets.ModelViewSet):
         except ReplyModel.DoesNotExist:
             return Response({'detail': 'reply comment did not exist'}, status=HTTP_404_NOT_FOUND)
 
+
+class SaveViewSet(viewsets.ModelViewSet):
+    queryset = SaveModel.objects.all()
+    serializer_class = SaveModelSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def create(self, request, *args, **kwargs):
+        user = request.user
+        post_id = request.data.get('post')
+
+        if not post_id:
+            return Response({"detail":"Post did not found"}, status=HTTP_400_BAD_REQUEST)
+
+        try:
+            post = PostModel.objects.get(id=post_id)
+            save = SaveModel.objects.filter(post=post_id, user=user).first()
+
+            if save:
+                save.delete()
+                return Response(
+                    {
+                        'saved':False,
+                        'saves_count':SaveModel.objects.filter(post=post).count(),
+                        'detail':'Post unsaved'}, status=HTTP_200_OK)
+            else:
+                SaveModel.objects.create(post=post, user=user)
+                return Response(
+                    {
+                        'saved': True,
+                        'saves_count': SaveModel.objects.filter(post=post).count(),
+                        'detail': 'Post saved'},
+                    status=HTTP_201_CREATED)
+
+        except PostModel.DoesNotExist:
+            return Response({'detail':'Post does not exist'}, status=HTTP_404_NOT_FOUND)
+
+
+
+class RepostViewSet(viewsets.ModelViewSet):
+    queryset = RepostModel.objects.all()
+    serializer_class = RepostModelSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def create(self, request, *args, **kwargs):
+        user = request.user
+        post_id = request.data.get('post')
+
+        if not post_id:
+            return Response({"detail": "Post did not found"}, status=HTTP_400_BAD_REQUEST)
+
+        try:
+            post = PostModel.objects.get(id=post_id)
+            repost = RepostModel.objects.filter(post=post, user=user).first()
+
+            if repost:
+                repost.delete()
+                return Response(
+                    {
+                        'reposted': False,
+                        'reposts_count': RepostModel.objects.filter(post=post).count(),
+                        'detail': 'Post unreposted'
+                    }, status=HTTP_200_OK)
+            else:
+                RepostModel.objects.create(post=post, user=user)
+                return Response(
+                    {
+                        'reposted': True,
+                        'reposts_count': RepostModel.objects.filter(post=post).count(),
+                        'detail': 'Post reposted'
+                    },
+                    status=HTTP_201_CREATED)
+
+        except PostModel.DoesNotExist:
+            return Response({'detail': 'Post does not exist'}, status=HTTP_404_NOT_FOUND)

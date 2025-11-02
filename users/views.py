@@ -59,12 +59,6 @@ class CurrentUserView(APIView):
         posts = PostModel.objects.filter(user=request.user)
         post_serializer = PostModelSerializer(posts, many=True)
 
-        saved_posts = request.user.saved_posts.all()
-        reposts = request.user.reposts.all()
-
-        saved_posts_serializer = PostModelSerializer(saved_posts, many=True)
-        reposts_serializer = PostModelSerializer(reposts, many=True)
-
         return Response({
             "id": request.user.id,
             "username": request.user.username,
@@ -75,8 +69,6 @@ class CurrentUserView(APIView):
             "follower_count": request.user.followers_count,
             "following_count": request.user.following_count,
             "posts": post_serializer.data,
-            "saved_posts": saved_posts_serializer.data,
-            "reposts": reposts_serializer.data
         })
 
     def put(self, request):

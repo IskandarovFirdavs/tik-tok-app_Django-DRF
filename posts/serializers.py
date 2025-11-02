@@ -11,9 +11,9 @@ from posts.models import (
     ReplyCommentLikeModel,
     ReplyCommentDislikeModel,
     ViewModel,
-    NotificationModel,
+    NotificationModel, SaveModel, RepostModel,
 )
-from users.serializers import UserSerializer, UserModelSerializer, FollowSerializer
+from users.serializers import  UserModelSerializer
 
 
 # ============================
@@ -165,7 +165,8 @@ class PostModelSerializer(serializers.ModelSerializer):
     comments = CommentModelSerializer(many=True, read_only=True)
     likes_count = serializers.IntegerField(source='likes.count', read_only=True)
     liked_by_current_user = serializers.SerializerMethodField()
-    
+    saves_count = serializers.IntegerField(source='saves.count', read_only=True)
+    saved_by_current_user = serializers.SerializerMethodField()
     music_id = serializers.PrimaryKeyRelatedField(
         queryset=MusicModel.objects.all(),
         write_only=True,
@@ -182,11 +183,26 @@ class PostModelSerializer(serializers.ModelSerializer):
         source="hashtags",
         required=False
     )
+    reposts_count = serializers.IntegerField(source='reposts.count', read_only=True)
+    reposted_by_current_user = serializers.SerializerMethodField()
+
 
     def get_liked_by_current_user(self, obj):
         request = self.context.get('request', None)
         if request and request.user.is_authenticated:
             return obj.likes.filter(user=request.user).exists()
+        return False
+
+    def get_reposted_by_current_user(self, obj):
+        request = self.context.get('request', None)
+        if request and request.user.is_authenticated:
+            return obj.reposts.filter(user=request.user).exists()
+        return False
+
+    def get_saved_by_current_user(self, obj):
+        request = self.context.get('request', None)
+        if request and request.user.is_authenticated:
+            return obj.saves.filter(user=request.user).exists()
         return False
 
     class Meta:
@@ -238,3 +254,29 @@ class ViewModelSerializer(serializers.ModelSerializer):
 
 
 
+
+class SaveModelSerializer(serializers.ModelSerializer):
+    user = UserModelSerializer(read_only=True)
+    post = PostModelSerializer(read_only=True)
+
+    class Meta:
+        model = SaveModel
+        fields = ['id', 'user', 'post', 'created_at']
+        read_only_fields = ['id', 'user', 'created_at']
+
+
+class RepostModelSerializer(serializers.ModelSerializer):
+    user = UserModelSerializer(read_only=True)
+    post_title = serializers.CharField(source='post.title', read_only=True)
+
+    class Meta:
+        model = RepostModel
+        fields = [
+            'id',
+            'user',
+            'post',
+            'post_title',
+            'text',
+            'created_at'
+        ]
+        read_only_fields = ['id', 'user', 'created_at']

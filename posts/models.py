@@ -42,7 +42,6 @@ class PostModel(models.Model):
         Education = 'EDUCATION', 'Education'
         Technology = 'TECHNOLOGY', 'Technology'
 
-
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE, related_name='posts')
     post = models.FileField(upload_to="posts/")
     title = models.CharField(max_length=100)
@@ -52,17 +51,6 @@ class PostModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     saved = models.BooleanField(default=False)
     genre = models.CharField(max_length=30, choices=GenreChoice, null=True, blank=True)
-    saves = models.ManyToManyField(
-        UserModel,
-        null=True,
-        blank=True,
-        related_name='saved_posts'
-    )
-    reposts = models.ManyToManyField(
-        UserModel,
-        null=True, blank=True,
-        related_name='reposts'
-    )
 
     def __str__(self):
         return self.user.username
@@ -179,4 +167,33 @@ class NotificationModel(models.Model):
 
     def __str__(self):
         return f"Notif {self.notif_type} to {self.receiver.username}"
+
+
+class SaveModel(models.Model):
+    user = models.ForeignKey(UserModel, on_delete=models.CASCADE, related_name='saves')
+    post = models.ForeignKey(PostModel, on_delete=models.CASCADE, related_name='saves')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['user', 'post']
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username} saved {self.post.title}"
+
+
+
+class RepostModel(models.Model):
+    user = models.ForeignKey(UserModel, on_delete=models.CASCADE, related_name='reposts')
+    post = models.ForeignKey(PostModel, on_delete=models.CASCADE, related_name='reposts')
+    text = models.CharField(max_length=50, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['user', 'post']
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username} reposted {self.post.title}"
+
 
